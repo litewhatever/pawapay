@@ -38,6 +38,9 @@
     - name: Update apt cache
       ansible.builtin.apt:
         update_cache: yes
+  roles:
+    - role: cloudalchemy.node_exporter
+      tags: node_exporter
   tags:
     - base
 
@@ -113,3 +116,28 @@
       tags: kibana
   tags:
     - kibana
+
+- name: Install and configure prometheus/grafana.
+  hosts: prometheus
+  become: true
+  become_method: sudo
+  gather_facts: yes
+  vars_files:
+    - "group_vars/local/common.yml"
+    - "group_vars/local/prometheus.yml"
+  pre_tasks:
+    - name:
+      include_tasks:
+        file: "tasks/prometheus-pre.yml"
+        apply:
+          tags:
+            - prometheus-pre
+      tags:
+        - always
+  roles:
+    - role: cloudalchemy.prometheus
+      tags: prometheus-role
+    - role: cloudalchemy.grafana
+      tags: grafana
+  tags:
+    - prometheus

@@ -1,0 +1,39 @@
+---
+# cloudalchemy.prometheus variables
+prometheus_version: 2.30.3
+prometheus_scrape_configs:
+  - job_name: "static-scrape-job"
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - "localhost:9090" # prometheus own metrics
+          - "localhost:9100" # prometheus node exporter
+          - "192.168.56.51:9100" # elasticsearch1 node exporter
+          - "192.168.56.52:9100" # elasticsearch2 node exporter
+          - "192.168.56.53:9100" # elasticsearch3 node exporter
+          - "192.168.56.61:9100" # logstash node exporter
+          - "192.168.56.62:9100" # kibana node exporter
+
+# cloudalchemy.grafana variables
+grafana_version: 8.2.0
+grafana_datasources:
+  - name: prometheus
+    type: prometheus
+    access: proxy
+    url: "http://localhost:9090"
+    basicAuth: false
+
+grafana_dashboards:
+  - name: node exporter dashboard
+    dashboard_id: 11074
+    revision_id: 9
+    datasource: prometheus
+
+grafana_security:
+  admin_user: admin
+  admin_password: secret
+
+grafana_server:
+  protocol: https
+  cert_key: "/etc/grafana/grafana.key"
+  cert_file: "/etc/grafana/grafana.crt"

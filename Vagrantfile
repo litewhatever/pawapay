@@ -54,7 +54,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     
     node.vm.network :private_network, ip: "#{$subnet}.62"
     node.vm.network "forwarded_port", guest: 22, host: "#{$ssh_port_prefix}62", id: "ssh"
-    node.vm.network "forwarded_port", guest: 5601, host: "5601", id: "kibana"
+    node.vm.network "forwarded_port", guest: 5601, host: 5601, id: "kibana"
   end
 
   # prometheus instance
@@ -68,6 +68,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     
     node.vm.network :private_network, ip: "#{$subnet}.63"
     node.vm.network "forwarded_port", guest: 22, host: "#{$ssh_port_prefix}63", id: "ssh"
+    node.vm.network "forwarded_port", guest: 3000, host: 3000, id: "grafana"
     
     # provision with ansible
     node.vm.provision "ansible" do |ansible|
@@ -85,7 +86,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       }
       # ansible verbosity and tags
       #ansible.verbose  = "vvvv"
-      ansible.tags = [ "base", "logstash" ]
+      #ansible.tags = [ "grafana" ]
     end
   end
 end

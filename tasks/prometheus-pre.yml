@@ -1,47 +1,46 @@
 ---
-- name: Add kibana group
+- name: Add grafana group
   ansible.builtin.group:
-    name: kibana
+    name: grafana
     system: true
   
-- name: Add kibana user
+- name: Add grafana user
   ansible.builtin.user:
-    name: kibana
+    name: grafana
     system: true
     shell: /bin/false
-    home: /nonexistent
+    home: /usr/share/grafana
 
 - name: Create directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: root
-    group: kibana
+    group: grafana
   loop:
-    - /etc/kibana
+    - /etc/grafana
 
 - name: Generate private key
   community.crypto.openssl_privatekey:
-    path: /etc/kibana/kibana.key
-    owner: kibana
-    group: kibana
-    mode: 0640
+    path: /etc/grafana/grafana.key
+    owner: grafana
+    group: grafana
 
 - name: Generate a CSR
   community.crypto.openssl_csr:
-    path: /etc/kibana/kibana.csr
-    owner: kibana
-    group: kibana
-    privatekey_path: /etc/kibana/kibana.key
+    path: /etc/grafana/grafana.csr
+    owner: grafana
+    group: grafana
+    privatekey_path: /etc/grafana/grafana.key
     common_name: "{{ ansible_hostname }}"
     subject_alt_name: "DNS:localhost,DNS:{{ ansible_hostname }},IP:{{ ansible_enp0s8.ipv4.address }}"
 
 - name: Sign certificate with CA
   community.crypto.x509_certificate:
-    path: /etc/kibana/kibana.crt
-    owner: kibana
-    group: kibana
-    csr_path: /etc/kibana/kibana.csr
+    path: /etc/grafana/grafana.crt
+    owner: grafana
+    group: grafana
+    csr_path: /etc/grafana/grafana.csr
     ownca_content: "{{lookup('file', 'files/pawapay-assignment-ca.crt') }}"
     ownca_privatekey_content: "{{lookup('file', 'files/pawapay-assignment-ca.key') }}"
     provider: ownca
@@ -49,6 +48,6 @@
 - name: Copy CA certificate
   ansible.builtin.copy:
     src: pawapay-assignment-ca.crt
-    dest: /etc/kibana/ca.crt
-    owner: kibana
-    group: kibana
+    dest: /etc/grafana/ca.crt
+    owner: grafana
+    group: grafana
