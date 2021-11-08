@@ -1,0 +1,6 @@
+.vagrant
+*.log
+site_local.retry
+vault_pass*
+/roles
+/collections

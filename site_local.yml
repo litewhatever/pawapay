@@ -1,0 +1,25 @@
+---
+- name: Prepare local development environment
+  hosts: all
+  become: True
+  become_method: sudo
+  gather_facts: no
+  pre_tasks:
+    - name: 'install python3'
+      raw: test -e /usr/bin/python3 || (export DEBIAN_FRONTEND=noninteractive; apt -y update && apt install -y python3-minimal)
+      changed_when: false
+    # Uncomment to enable additional modules before ansible run
+    #- name: 'install python3 dependencies'
+    #  raw: test -e /usr/bin/pip3 || (export DEBIAN_FRONTEND=noninteractive; apt -y update && apt install -y python3-setuptools python3-pip)
+    #  changed_when: false
+    #- name: 'install consul python3 module'
+    #  raw: pip3 list --format=columns | grep python-consul || pip3 install python-consul
+    #  changed_when: false
+    #- name: 'install docker python3 module'
+    #  raw: pip3 list --format=columns | grep docker || pip3 install docker
+    #  changed_when: false
+
+# We enable fact gathering for all servers. This makes it possible to use role level tags. Do not remove!
+- name: Gather facts for all servers.
+  hosts: all
+  gather_facts: yes
