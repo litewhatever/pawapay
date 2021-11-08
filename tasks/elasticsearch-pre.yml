@@ -1,0 +1,53 @@
+---
+- name: Add elasticsearch group
+  ansible.builtin.group:
+    name: elasticsearch
+    system: true
+  
+- name: Add elasticsearch user
+  ansible.builtin.user:
+    name: elasticsearch
+    system: true
+    shell: /bin/false
+    home: /nonexistent
+
+- name: Create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: elasticsearch
+  loop:
+    - /etc/elasticsearch
+
+- name: Generate private key
+  community.crypto.openssl_privatekey:
+    path: /etc/elasticsearch/elasticsearch.key
+    owner: elasticsearch
+    group: elasticsearch
+
+- name: Generate a CSR
+  community.crypto.openssl_csr:
+    path: /etc/elasticsearch/elasticsearch.csr
+    owner: elasticsearch
+    group: elasticsearch
+    privatekey_path: /etc/elasticsearch/elasticsearch.key
+    common_name: "{{ ansible_hostname }}"
+    subject_alt_name: "DNS:localhost,DNS:{{ ansible_hostname }},IP:{{ ansible_enp0s8.ipv4.address }}"
+
+- name: Sign certificate with CA
+  community.crypto.x509_certificate:
+    path: /etc/elasticsearch/elasticsearch.crt
+    owner: elasticsearch
+    group: elasticsearch
+    csr_path: /etc/elasticsearch/elasticsearch.csr
+    ownca_content: "{{lookup('file', 'files/pawapay-assignment-ca.crt') }}"
+    ownca_privatekey_content: "{{lookup('file', 'files/pawapay-assignment-ca.key') }}"
+    provider: ownca
+
+- name: Copy CA certificate
+  ansible.builtin.copy:
+    src: pawapay-assignment-ca.crt
+    dest: /etc/elasticsearch/ca.crt
+    owner: elasticsearch
+    group: elasticsearch

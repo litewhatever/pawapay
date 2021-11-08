@@ -1,0 +1,2 @@
+ansible==2.10.4
+cryptography==3.4.7

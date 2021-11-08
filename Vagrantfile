@@ -36,7 +36,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     
     node.vm.provider :virtualbox do |vb|
       vb.gui = $gui_mode
-      vb.memory = 1024
+      vb.memory = 2048
     end
     
     node.vm.network :private_network, ip: "#{$subnet}.61"
@@ -85,7 +85,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       }
       # ansible verbosity and tags
       #ansible.verbose  = "vvvv"
-      #ansible.tags = "kibana"
+      ansible.tags = [ "base", "logstash" ]
     end
   end
 end

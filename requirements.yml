@@ -1,10 +1,19 @@
 ---
+collections:
+  - name: community.crypto
+    version: 2.0.0
 roles:
   - src: geerlingguy.java
     version: 1.10.0
   - src: geerlingguy.elasticsearch
     version: 5.1.0
-  - src: geerlingguy.logstash
-    version: 5.2.1
+  # forked from geerlingguy.logstash to support ca certificate on elasticsearch output
+  - src: https://github.com/litewhatever/ansible-role-logstash
   - src: geerlingguy.kibana
     version: 4.0.1
+  - name: cloudalchemy.grafana
+    version: 0.18.0
+  - name: cloudalchemy.node_exporter
+    version: 2.0.0
+  - name: cloudalchemy.prometheus
+    version: 4.0.0

@@ -19,10 +19,12 @@
     #  raw: pip3 list --format=columns | grep docker || pip3 install docker
     #  changed_when: false
 
-# We enable fact gathering for all servers. This makes it possible to use role level tags. Do not remove!
+# We enable fact gathering for all servers always.
 - name: Gather facts for all servers.
   hosts: all
   gather_facts: yes
+  tags:
+    - always
 
 - name: Base setup for all instances.
   hosts: all
@@ -30,7 +32,7 @@
   become_method: sudo
   gather_facts: yes
   vars_files:
-    - "group_vars/local/main.yml"
+    - "group_vars/local/common.yml"
   # We are updating apt cache as a workaround as all roles might not do this properly
   pre_tasks:
     - name: Update apt cache
@@ -45,8 +47,17 @@
   become_method: sudo
   gather_facts: yes
   vars_files:
+    - "group_vars/local/common.yml"
     - "group_vars/local/elasticsearch.yml"
-    - "group_vars/local/main.yml"
+  pre_tasks:
+    - name:
+      include_tasks:
+        file: "tasks/elasticsearch-pre.yml"
+        apply:
+          tags:
+            - elasticsearch-pre
+      tags:
+        - always
   roles:
     - role: geerlingguy.java
       tags: java
@@ -61,12 +72,19 @@
   become_method: sudo
   gather_facts: yes
   vars_files:
+    - "group_vars/local/common.yml"
     - "group_vars/local/logstash.yml"
-    - "group_vars/local/main.yml"
+  pre_tasks:
+    - name:
+      include_tasks:
+        file: "tasks/logstash-pre.yml"
+        apply:
+          tags:
+            - logstash-pre
+      tags:
+        - always
   roles:
-    - role: geerlingguy.java
-      tags: java
-    - role: geerlingguy.logstash
+    - role: ansible-role-logstash
       tags: logstash
   tags:
     - logstash
@@ -77,8 +95,17 @@
   become_method: sudo
   gather_facts: yes
   vars_files:
+    - "group_vars/local/common.yml"
     - "group_vars/local/kibana.yml"
-    - "group_vars/local/main.yml"
+  pre_tasks:
+    - name:
+      include_tasks:
+        file: "tasks/kibana-pre.yml"
+        apply:
+          tags:
+            - kibana-pre
+      tags:
+        - always
   roles:
     - role: geerlingguy.java
       tags: java

@@ -2,4 +2,5 @@
 # kibana variables
 kibana_version: "7.x"
 kibana_package: kibana=7.15.1
-kibana_elasticsearch_url: "[{{ groups['elasticsearch'] | map('extract', hostvars, ['ansible_enp0s8', 'ipv4', 'address']) | map('regex_replace', '^(.*)$','http://\\1:9200') | join(',') }}]"
+kibana_elasticsearch_url: "{{ groups['elasticsearch'] | map('extract', hostvars, ['ansible_enp0s8', 'ipv4', 'address']) | map('regex_replace', '^(.*)$','https://\\1:9200') | list }}"
+kibana_config_template: kibana_custom.yml.j2

@@ -1,0 +1,53 @@
+---
+- name: Add kibana group
+  ansible.builtin.group:
+    name: kibana
+    system: true
+  
+- name: Add kibana user
+  ansible.builtin.user:
+    name: kibana
+    system: true
+    shell: /bin/false
+    home: /nonexistent
+
+- name: Create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: kibana
+  loop:
+    - /etc/kibana
+
+- name: Generate private key
+  community.crypto.openssl_privatekey:
+    path: /etc/kibana/kibana.key
+    owner: kibana
+    group: kibana
+
+- name: Generate a CSR
+  community.crypto.openssl_csr:
+    path: /etc/kibana/kibana.csr
+    owner: kibana
+    group: kibana
+    privatekey_path: /etc/kibana/kibana.key
+    common_name: "{{ ansible_hostname }}"
+    subject_alt_name: "DNS:localhost,DNS:{{ ansible_hostname }},IP:{{ ansible_enp0s8.ipv4.address }}"
+
+- name: Sign certificate with CA
+  community.crypto.x509_certificate:
+    path: /etc/kibana/kibana.crt
+    owner: kibana
+    group: kibana
+    csr_path: /etc/kibana/kibana.csr
+    ownca_content: "{{lookup('file', 'files/pawapay-assignment-ca.crt') }}"
+    ownca_privatekey_content: "{{lookup('file', 'files/pawapay-assignment-ca.key') }}"
+    provider: ownca
+
+- name: Copy CA certificate
+  ansible.builtin.copy:
+    src: pawapay-assignment-ca.crt
+    dest: /etc/kibana/ca.crt
+    owner: kibana
+    group: kibana

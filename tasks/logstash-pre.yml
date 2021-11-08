@@ -1,0 +1,28 @@
+---
+- name: Add kibana group
+  ansible.builtin.group:
+    name: logstash
+    system: true
+  
+- name: Add kibana user
+  ansible.builtin.user:
+    name: logstash
+    system: true
+    shell: /bin/false
+    home: /nonexistent
+
+- name: Create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: logstash
+  loop:
+    - /etc/logstash
+
+- name: Copy CA certificate
+  ansible.builtin.copy:
+    src: pawapay-assignment-ca.crt
+    dest: /etc/logstash/ca.crt
+    owner: logstash
+    group: logstash
