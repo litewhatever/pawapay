@@ -23,3 +23,50 @@
 - name: Gather facts for all servers.
   hosts: all
   gather_facts: yes
+
+- name: Base setup for all instances.
+  hosts: all
+  become: true
+  become_method: sudo
+  gather_facts: yes
+  vars_files:
+    - "group_vars/local/main.yml"
+  # We are updating apt cache as a workaround as all roles might not do this properly
+  pre_tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+  tags:
+    - base
+
+- name: Install and configure elasticsearch.
+  hosts: elasticsearch
+  become: true
+  become_method: sudo
+  gather_facts: yes
+  vars_files:
+    - "group_vars/local/elasticsearch.yml"
+    - "group_vars/local/main.yml"
+  roles:
+    - role: geerlingguy.java
+      tags: java
+    - role: geerlingguy.elasticsearch
+      tags: elasticsearch
+  tags:
+    - elasticsearch
+
+- name: Install and configure logstash.
+  hosts: logstash
+  become: true
+  become_method: sudo
+  gather_facts: yes
+  vars_files:
+    - "group_vars/local/logstash.yml"
+    - "group_vars/local/main.yml"
+  roles:
+    - role: geerlingguy.java
+      tags: java
+    - role: geerlingguy.logstash
+      tags: logstash
+  tags:
+    - logstash

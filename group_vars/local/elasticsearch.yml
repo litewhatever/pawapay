@@ -1,0 +1,10 @@
+---
+# elasticsearch variables
+elasticsearch_version: '7.x'
+elasticsearch_package: elasticsearch=7.15.1
+elasticsearch_network_host: "{{ ansible_enp0s8.ipv4.address }}"
+elasticsearch_heap_size_min: 1g
+elasticsearch_heap_size_max: 1g
+elasticsearch_extra_options: |
+  cluster.initial_master_nodes: "{{ groups['elasticsearch'] | map('extract', hostvars, ['ansible_hostname']) | join(',') }}"
+  discovery.seed_hosts: "{{ groups['elasticsearch'] | map('extract', hostvars, ['ansible_enp0s8', 'ipv4', 'address']) | join(',') }}"
