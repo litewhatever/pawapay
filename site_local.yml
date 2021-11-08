@@ -70,3 +70,19 @@
       tags: logstash
   tags:
     - logstash
+
+- name: Install and configure kibana.
+  hosts: kibana
+  become: true
+  become_method: sudo
+  gather_facts: yes
+  vars_files:
+    - "group_vars/local/kibana.yml"
+    - "group_vars/local/main.yml"
+  roles:
+    - role: geerlingguy.java
+      tags: java
+    - role: geerlingguy.kibana
+      tags: kibana
+  tags:
+    - kibana

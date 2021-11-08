@@ -17,5 +17,9 @@ echo "pass" > vault_pass_local.txt
 5. Import CA certiticate to browser truststore to avoid warnings
 6. Services should be at:
 
+| Service | URL |
+| --- | --- |
+| kibana | http://localhost:5601 |
+
 ## Notes
 - Instances run in GUI mode because Virtualbox has [issues](https://www.virtualbox.org/ticket/20636) on macos monterey. It is possible to disable gui mode in Vagrantfile with `gui_mode` variable.

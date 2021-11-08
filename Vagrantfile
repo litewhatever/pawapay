@@ -21,6 +21,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
       node.vm.provider :virtualbox do |vb|
         vb.gui = $gui_mode
+        vb.cpus = 2
         vb.memory = 2048
       end
 
@@ -53,6 +54,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     
     node.vm.network :private_network, ip: "#{$subnet}.62"
     node.vm.network "forwarded_port", guest: 22, host: "#{$ssh_port_prefix}62", id: "ssh"
+    node.vm.network "forwarded_port", guest: 5601, host: "5601", id: "kibana"
   end
 
   # prometheus instance
@@ -81,8 +83,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         "kibana" => [ "kibana" ],
         "prometheus" => [ "prometheus" ]
       }
-      # Enable ansible verbosity
+      # ansible verbosity and tags
       #ansible.verbose  = "vvvv"
+      #ansible.tags = "kibana"
     end
   end
 end
